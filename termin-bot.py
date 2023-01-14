@@ -1,150 +1,313 @@
 #Quelle: https://selenium-python.readthedocs.io/
 
+#!/usr/bin/env python
+import config as c
+
 from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.relative_locator import locate_with
+from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import TimeoutException
-from csv import writer
-from csv import reader
+from selenium.webdriver.firefox.options import Options
+from fake_useragent import UserAgent
+from datetime import datetime
 from pathlib import Path
+import random
 import time
+import os
+import logging
 
+
+GECKOPATH = "C:\\path\\to\\geckodriver.exe"
+GECKOPATH = "/usr/local/bin/geckodriver"
+LOGFILE = "./Visametric.log"
+
+logging.basicConfig(filename=LOGFILE, level=logging.INFO)
+
+OKGREEN = '\033[92m'                                                            
+OKBLUE = '\033[94m'                                                             
+ENDC = '\033[0m'                                                                
+BOLD = "\033[1m"                                                                
+                                                                                
+HEADER = '\033[95m'                                                             
+WARNING = '\033[93m'                                                            
+FAIL = '\033[91m'                                                               
+           
+class Output:
+
+    def warn(self, message):
+        print('\t' + WARNING + message + ENDC+'\n')
+    def error(self, message):
+        print('\t' + FAIL + message + ENDC+'\n')
+    def info(self, message):
+        print('\t' + OKBLUE + message + ENDC+'\n') 
+    def success(self, message):
+        print('\t' + OKGREEN + message + ENDC+'\n') 
+    def passed(self, message):
+        print('\t' + BOLD + message + ENDC+'\n') 
+    def header(self, message):
+        print('\t' + HEADER + message + ENDC+'\n')         
+        
 class Search:
 
     def __init__(self):
-        self.url = "https://scholar.google.de/"
-        self.driver = webdriver.Firefox()
+        self.url = "http://www.python.org"
+        options = Options()
+        ua = UserAgent()
+        userAgent = ua.random
+        print(userAgent)
+        options.add_argument(f'user-agent={userAgent}')
+        firefox_profile = webdriver.FirefoxProfile()
+        firefox_profile.set_preference("browser.privatebrowsing.autostart", True)
+        cap = DesiredCapabilities().FIREFOX
+        cap["marionette"] = False
+        self.driver = webdriver.Firefox(capabilities=cap, options=options, firefox_profile=firefox_profile, executable_path=GECKOPATH)
         self.driver.get(self.url)
-
-        
+   
 
     def test_search_in_python_org(self):
         driver = self.driver
         driver.get("http://www.python.org")
-        self.assertIn("Python", driver.title)
-        elem = driver.find_element_by_name("q")
+        assert 'Python' in driver.title
+        elem = driver.find_element(By.NAME, 'q')
         elem.send_keys("pycon")
         elem.send_keys(Keys.RETURN)
+        #el = WebDriverWait(driver, timeout=3).until(lambda d: d.find_element(By.TAG_NAME,"p"))
+        #assert el.text == "Hello from JavaScript!"
         assert "No results found." not in driver.page_source
         
-    def search(self, text):
-        counter = 0
-        value = ""
-        zitateURL = ""
+    def getTerminByVisametric(self):
+        out = Output()
         driver = self.driver
-#        element = driver.find_element_by_id("gs_hdr_tsi")
-        element = driver.find_element_by_name("q")
-        element.clear()
-        # save current page url
-        current_url = driver.current_url
-        driver.implicitly_wait(2) # seconds
-        element.send_keys(text, Keys.RETURN)
-        # wait for URL to change with 15 seconds timeout
-        WebDriverWait(driver, 15).until(EC.url_changes(current_url))
-        isCaptcha = 1
-        while isCaptcha == 1:
-            try:
-                captcha = WebDriverWait(driver, 2).until(
-                    EC.presence_of_element_located((By.ID, 'gs_captcha_f'))
-                )
-                print("Captcha entdeckt")
-                # taking input from the user
-                print("Nochmal versuchen? (y/n)")
-                a = input()
-                # printing the data
-                print("User data:-", a)
-                if a == "y":
-                    isCaptcha = 1
-                else:
-                    isCaptcha = 0 
-                    return "null"
-            except (NoSuchElementException, TimeoutException) as e:
-                isCaptcha = 0 
-                print("Kein Captcha entdeckt")
-               
-               
-               
-               
-#        while isCaptcha == 1:
+        driver.get(c.legalization['landing_page'])
         try:
-            zitiert_link = WebDriverWait(driver, 2).until(
-                EC.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'Zitiert von:'))
+            assert 'Visametric - Visa Application Center' in driver.title
+        except AssertionError:
+            os.system('spd-say "Error. Page not found!"')
+            out.fail("Error. Page not found!")
+
+        #Push Button name="legalizationBtn" 
+        elem = driver.find_element(By.NAME, 'legalizationBtn')
+        elem.click()
+        #Check OK Radio-Input name="surveyStart" id="result0"
+        elem = driver.find_element(By.ID, 'result0')
+        elem.click()
+        #Check Iran Radio-Input name="nationality" id="result1"
+        WebDriverWait(driver, random.randint(5,25)).until(
+                    EC.element_to_be_clickable((By.ID, 'result1'))
+                )
+        elem = driver.find_element(By.ID, 'result1')
+        elem.click()
+        # Captcha Part id="recaptcha-anchor"
+        WebDriverWait(driver, random.randint(10,25)).until(
+            EC.frame_to_be_available_and_switch_to_it((By.XPATH,"//iframe[starts-with(@name, 'a-') and starts-with(@src, 'https://www.google.com/recaptcha')]"))
             )
-    #       zitiert_link = driver.find_element_by_partial_link_text('Zitiert von:')
-            value = zitiert_link.get_attribute('innerHTML')
-            counter = value[13:] #Entfernt 'Zitiert von: ' vor der Zahl
-            zitateURL = zitiert_link.get_attribute('href')
-#            isCaptcha = 0
-        except (NoSuchElementException, TimeoutException) as e:
-            counter = 0
-            print (text+" No Link found.")
-#            element.clear()
-#            isCaptcha = 1
-            counter = 0
-            zitateURL = ""
-        return [str(counter), str(zitateURL)]
+        element = WebDriverWait(driver, random.randint(10,25)).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "div.recaptcha-checkbox-checkmark"))
+            )
+        driver.execute_script("arguments[0].click();", element)
+        current_url = driver.current_url
+        elem = driver.find_element(By.ID, 'recaptcha-anchor')
+        while elem.get_attribute("aria-checked") == 'false' :
+            os.system('spd-say "Waiting for human interaction."')
+            out.warn("Please resolve the captcha or press 'str+c' ")
+            out.warn('Waiting for human interaction.')
+            time.sleep(10) # Delay for 10 seconds.
+        out.info('captcha done')
+        
+        driver.switch_to.default_content()
+        #To ignore google recaptcha
+#        driver.execute_script("$('#formAccessApplication').submit();")
+        driver.find_element(By.ID, 'btnSubmit').click()
+
+        
+        while current_url == driver.current_url:
+            try:
+                WebDriverWait(driver, random.randint(10,25)).until(EC.url_changes(current_url))
+            except:
+                out.warn("Please push the blue button. ")
+        time.sleep(2) # Delay for 2 seconds.
+        
+        
+        #Select input id="city"
+        select = Select(WebDriverWait(driver, random.randint(10,25)).until(
+                EC.presence_of_element_located((By.ID, 'city'))
+            ))
+        
+        
+        #select = Select(driver.find_element(By.ID, 'city'))
+        select.select_by_visible_text(c.legalization["first_form"]['city'])
+        #Select input id="office"
+        select = Select(driver.find_element(By.ID, 'office'))
+        select.select_by_visible_text(c.legalization["first_form"]['office'])
+        #Select input id="officetype"
+        select = Select(driver.find_element(By.ID, 'officetype'))
+        select.select_by_visible_text(c.legalization["first_form"]['officetype'])
+        #Select input id="totalPerson"
+        select = Select(driver.find_element(By.ID, 'totalPerson'))
+        select.select_by_visible_text(c.legalization["first_form"]['totalPerson'])
+        #Check ATM Radio-Input id="atm"
+        WebDriverWait(driver, 5).until(
+                    EC.element_to_be_clickable((By.ID, 'atm'))
+                )
+        elem = driver.find_element(By.ID, 'atm')
+        elem.click()
+        #Input Cardnumber id="paymentCardInput"
+        WebDriverWait(driver, 5).until(
+                    EC.element_to_be_clickable((By.ID, 'paymentCardInput'))
+                )
+        elem = driver.find_element(By.ID, 'paymentCardInput')
+        elem.send_keys(c.legalization["first_form"]['paymentCardInput'])
+        
+         #id="popupDatepicker2"
+        elemDatePicker = driver.find_element(By.ID, 'popupDatepicker2')
+        driver.execute_script("arguments[0].removeAttribute('readonly')", WebDriverWait(driver, 20).until(EC.element_to_be_clickable(elemDatePicker)))
+        elemDatePicker.clear()
+        elemDatePicker.send_keys(c.legalization["first_form"]['date'])
+        
+        #Button id="checkCardListBtn"
+        driver.find_element(By.ID, 'checkCardListBtn').click()
+        #Check  Radio-Input name="bankpayment"
+        WebDriverWait(driver, 5).until(
+                    EC.element_to_be_clickable((By.NAME, 'bankpayment'))
+                ).click()
+#        try:
+#            assert 'Visametric - Visa Application Center' in driver.title
+#        except AssertionError:
+        current_url = driver.current_url
+        #button id="btnAppCountNext"
+        driver.find_element(By.ID, 'btnAppCountNext').click()
+
+#        while current_url == driver.current_url:
+#            try:
+#                WebDriverWait(driver, random.randint(10,25)).until(EC.url_changes(current_url))
+#            except:
+#                out.warn("Please push the blue button. ")
+        time.sleep(2) # Delay for 2 seconds.
+        
+        #input id="scheba_number"
+        elem = WebDriverWait(driver, random.randint(10,25)).until(
+                EC.presence_of_element_located((By.ID, 'scheba_number'))
+            )
+        elem.send_keys(c.legalization["second_form"]['scheba_number'])
+        #input id="scheba_name" in persian letters!!!!
+        driver.find_element(By.ID, 'scheba_name').send_keys(c.legalization["second_form"]['scheba_name'])
+        #input id="name1"
+        driver.find_element(By.ID, 'name1').send_keys(c.legalization["second_form"]['name1'])
+        #input id="surname1"
+        driver.find_element(By.ID, 'surname1').send_keys(c.legalization["second_form"]['surname1'])
+        #Select input id="birthday1"
+        select = Select(driver.find_element(By.ID, 'birthday1'))
+        select.select_by_visible_text(c.legalization["second_form"]['birthday1'])
+        #Select input id="birthmonth1"
+        select = Select(driver.find_element(By.ID, 'birthmonth1'))
+        select.select_by_visible_text(c.legalization["second_form"]['birthmonth1'])
+        #Select input id="birthyear1"
+        select = Select(driver.find_element(By.ID, 'birthyear1'))
+        select.select_by_visible_text(c.legalization["second_form"]['birthyear1'])
+        #input id="passport1"
+        driver.find_element(By.ID, 'passport1').send_keys(c.legalization["second_form"]['passport1'])
+        #input id="phone1"
+        driver.find_element(By.ID, 'phone1').send_keys(c.legalization["second_form"]['phone1'])
+        #input id="phone21"
+        driver.find_element(By.ID, 'phone21').send_keys(c.legalization["second_form"]['phone21'])
+        #input id="email1"
+        driver.find_element(By.ID, 'email1').send_keys(c.legalization["second_form"]['email1'])
+        
+        #link id="btnAppPersonalNext"
+        current_url = driver.current_url
+        #button id="btnAppPersonalNext"
+        driver.find_element(By.ID, 'btnAppPersonalNext').click()
+        #checkbox id="previewchk"
+        elem = WebDriverWait(driver, random.randint(10,25)).until(
+                EC.presence_of_element_located((By.ID, 'previewchk'))
+            )
+        elem.click()
+        #button id="btnAppPreviewNext"
+        driver.find_element(By.ID, 'btnAppPreviewNext').click()
+        
+        time.sleep(2) # Delay for 2 seconds.
+        
+        elem = WebDriverWait(driver, random.randint(10,25)).until(
+                EC.presence_of_element_located((By.ID, 'datepicker'))
+            )
+        elem.click()
+
+        #driver.switch_to.frame(driver.find_elements(By.CSS_SELECTOR,"div .datepicker-days"))
+        foundTermin = False
+        countMonth = 0
+        while countMonth < 3:
+            dayElems = driver.find_elements(By.CSS_SELECTOR,".day")
+            monthElem = driver.find_element(By.CSS_SELECTOR,'.datepicker-switch').get_attribute('innerHTML')
+            for dayElem in dayElems:
+                value = dayElem.get_attribute('innerHTML')
+     
+                if "disabled" in dayElem.get_attribute('class'):
+                    #print (value +" "+monthElem+" Element is not clickable")
+                    i = 0
+                else:
+                    dayElem.click()
+                    print (value +" "+monthElem+" Element is clickable")
+                    foundTermin = True
+                    break
+                #For end
+            if foundTermin:
+                break
+            #Next Month Button
+            #<th class="next" style="visibility: visible;">»</th>
+            if countMonth < 2:
+                driver.find_element(By.CSS_SELECTOR, '.next').click()
+            countMonth += 1
+            #While End
+        if foundTermin:
+            #button id= btnAppCalendarNext
+            driver.find_element(By.ID, 'btnAppCalendarNext').click()
+            out.success(str(datetime.now())+" Es wurde ein Termin gefunden!!!!")
+            logging.info(str(datetime.now())+" Es wurde ein Termin gefunden!!!!")
+        else: 
+            out.info(str(datetime.now())+" Leider keine Termine gefunden.")
+            logging.info(str(datetime.now())+" Leider keine Termine gefunden.")
+        return foundTermin
+                
+        
+        
+
+
+        
+        #to refresh the browser
+        #driver.refresh()
+        # Zeit Element -> id="watch"
+        #<span id="watch"><b>7m 6s </b></span>
+        
+        #Abgelaufener Tag
+#<td class="old disabled day disabled">28</td>
+#TZoday
+#<td class="today disabled day disabled">14</td>
+                #disabled Day
+#        <td class="day disabled">19</td>
+        #tag nächster Monat
+       # <td class="new day disabled">1</td>
+        
+        
+
 
     def tearDown(self):
         self.driver.close()
-        
-class CSVHandler():
-    def __init__(self, csvFile, newCsvFile):
-        self.csvFile = csvFile
-        self.newCsvFile = newCsvFile
     
-    def run(self, zeile):
-        my_file = Path(self.newCsvFile)
-        line_finished = 0
-        if my_file.is_file(): #Wenn Datei existert
-            with open(self.newCsvFile, mode='r') as read_obj:
-                csv_reader = reader(read_obj)
-                line_finished = sum(1 for row in csv_reader)
-        print(str(line_finished) +" Zeilen übersprungen")
-        
-        s = Search()
-        with open(self.csvFile, mode='r') as read_obj, \
-                open(self.newCsvFile, 'a', newline='') as write_obj:
-            # Create a csv.reader object from the input file object
-            csv_reader = reader(read_obj)
-            # Create a csv.writer object from the output file object
-            csv_writer = writer(write_obj)
-            # Read each row of the input csv file as list
-            line_count = 0
-            for x in range(line_finished):
-                next(csv_reader)
-            for row in csv_reader:
-                if line_count == 0 and line_finished == 0:
-                    print(f'Column names are {", ".join(row)}')
-                    # Append the default text in the row / list
-                    row.append("Anz Zitate Google")
-                    row.append("Link zu Zitate Google")
-                else:
-                    value = s.search(row[zeile])
-                    if value == "null":
-                        break
-                    #print("Suche: "+row[zeile]+ " A:"+ value[0] +" URL: "+ value[1])
-                    print("Suche: "+row[zeile]+ " Zitate:"+ value[0])
-                    # Append the default text in the row / list
-                    row.append(value[0]) #Zitate Anzahl
-                    row.append(value[1]) #Zitate Link
-                # Add the updated row / list to the output file
-                csv_writer.writerow(row)  
-                print("Write in row "+ str(line_count+line_finished))
-                line_count += 1
-            print(f'Processed {line_count} lines.')
-        s.tearDown()
+
         
         
 
 if __name__ == "__main__":
-    csvFile = "IEEE_export2020.10.30-12.50.39.csv"
-    NewCsvFile = "Google_IEEE_export_2020.10.30-12.50.39.csv"
-    proz = CSVHandler(csvFile,NewCsvFile);
-    proz.run(13)
-#    s = Search()
-#    ret = s.search("10.1007/978-3-642-39354-9_35")
-#    print(ret[13:])
+    termin = False
+    
+    while termin == False:
+        s = Search()
+        termin = s.getTerminByVisametric()
+        if not termin:
+            s.tearDown()
+            del(s)
+#    s.test_search_in_python_org()
 #    s.tearDown()
