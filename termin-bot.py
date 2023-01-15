@@ -87,6 +87,7 @@ class Search:
         except AssertionError:
             os.system('spd-say "Error. Page not found!"')
             out.error("Error. Page not found!")
+            logging.error(str(datetime.now())+" Page not found: "+c.legalization['landing_page'])
             return None
 
         #Push Button name="legalizationBtn" 
