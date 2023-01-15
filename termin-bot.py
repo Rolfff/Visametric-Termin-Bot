@@ -86,7 +86,8 @@ class Search:
             assert 'Visametric - Visa Application Center' in driver.title
         except AssertionError:
             os.system('spd-say "Error. Page not found!"')
-            out.fail("Error. Page not found!")
+            out.error("Error. Page not found!")
+            return None
 
         #Push Button name="legalizationBtn" 
         elem = driver.find_element(By.NAME, 'legalizationBtn')
@@ -166,7 +167,7 @@ class Search:
         driver.execute_script("arguments[0].removeAttribute('readonly')", WebDriverWait(driver, 20).until(EC.element_to_be_clickable(elemDatePicker)))
         elemDatePicker.clear()
         elemDatePicker.send_keys(c.legalization["first_form"]['date'])
-        
+        elem.click()
         #Button id="checkCardListBtn"
         driver.find_element(By.ID, 'checkCardListBtn').click()
         #Check  Radio-Input name="bankpayment"
@@ -306,6 +307,9 @@ if __name__ == "__main__":
     while termin == False:
         s = Search()
         termin = s.getTerminByVisametric()
+        if termin == None:
+            termin = False
+            time.sleep(5) # Delay for 5 seconds.
         if not termin:
             s.tearDown()
             del(s)
