@@ -34,4 +34,4 @@ Optional for linux:
 5. Answer the Google captcha and wait. Good luck!
 
 ## Contribute
-open a (Issue)[https://github.com/Rolfff/Visametric-Termin-Bot/issues] fore questions or bugs. Or you can fix it yourself and create a change request. 
+open an [Issue](https://github.com/Rolfff/Visametric-Termin-Bot/issues) fore questions or bugs. Or you can fix it yourself and create a change request. 
