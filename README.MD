@@ -26,8 +26,12 @@ Optional for linux:
 - ```sudo apt install speech-dispatcher```
 
 
-## Useing
+## Usage
 1. [Downloard this script](https://github.com/Rolfff/Visametric-Termin-Bot/archive/refs/heads/master.zip).
 2. Fill [config_example.py](https://github.com/Rolfff/Visametric-Termin-Bot/blob/master/config_example.py) with your data.
 3. Rename the 'config_example.py' file to 'config.py'
 4. Open the command prompt at the location from the downloaded files and run ```python3 ./termin-bot.py```
+5. Answer the Google captcha and wait. Good luck!
+
+## Contribute
+open a (Issue)[https://github.com/Rolfff/Visametric-Termin-Bot/issues] fore questions or bugs. Or you can fix it yourself and create a change request. 
