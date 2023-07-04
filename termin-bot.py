@@ -19,13 +19,9 @@ import time
 import os
 import logging
 
-isLinux = True
-WIN_GECKOPATH = "C:\\path\\to\\geckodriver.exe"
-win_binary_location = r'C:\Program Files\Mozilla Firefox\firefox.exe'
-GECKOPATH = "/usr/local/bin/geckodriver"
-LOGFILE = "./Visametric.log"
+GECKOPATH = c.install["LINUX_GECKOPATH"]
 
-logging.basicConfig(filename=LOGFILE, level=logging.INFO)
+logging.basicConfig(filename=c.install["LOGFILE", level=logging.INFO)
 
 OKGREEN = '\033[92m'                                                            
 OKBLUE = '\033[94m'                                                             
@@ -56,9 +52,9 @@ class Search:
     def __init__(self):
         self.url = "http://www.python.org"
         options = Options()
-        if not isLinux:
-            options.binary_location = win_binary_location
-            GECKOPATH = WIN_GECKOPATH
+        if not c.install["isLinux"]:
+            options.binary_location = c.install["win_binary_location"]
+            GECKOPATH = c.install["WINDOWS_GECKOPATH"]
         ua = UserAgent()
         userAgent = ua.random
         print(userAgent)
@@ -89,7 +85,7 @@ class Search:
         try:
             assert 'Visametric - Visa Application Center' in driver.title
         except AssertionError:
-            if isLinux:
+            if c.install["isLinux"]:
                 os.system('spd-say "Error. Page not found!"')
             out.error("Error. Page not found!")
             logging.error(str(datetime.now())+" Page not found: "+c.legalization['landing_page'])
@@ -118,7 +114,7 @@ class Search:
         current_url = driver.current_url
         elem = driver.find_element(By.ID, 'recaptcha-anchor')
         while elem.get_attribute("aria-checked") == 'false' :
-            if isLinux:
+            if c.install["isLinux"]:
                 os.system('spd-say "Waiting for human interaction."')
             out.warn("Please resolve the captcha or press 'str+c' ")
             out.warn('Waiting for human interaction.')
