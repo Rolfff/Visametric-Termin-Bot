@@ -90,6 +90,14 @@ class Search:
         try:
             assert 'Visametric - Visa Application Center' in driver.title
         except AssertionError:
+            if 'Just a moment...' in driver.title:
+                while 'Just a moment...' in driver.title :
+                    if c.install["isLinux"]:
+                        os.system('spd-say "Waiting for human interaction."')
+                    out.warn("Please resolve the captcha or press 'str+c' ")
+                    out.warn('Waiting for human interaction.')
+                    time.sleep(10) # Delay for 10 seconds.
+            
             if c.install["isLinux"]:
                 os.system('spd-say "Error. Page not found!"')
             out.error("Error. Page not found!")
@@ -315,11 +323,11 @@ if __name__ == "__main__":
     while termin == False:
         s = Search()
         termin = s.getTerminByVisametric()
-        if termin == None:
-            termin = False
-            time.sleep(5) # Delay for 5 seconds.
-        if not termin:
-            s.tearDown()
-            del(s)
+#        if termin == None:
+#            termin = False
+#            time.sleep(5) # Delay for 5 seconds.
+#        if not termin:
+#            s.tearDown()
+#            del(s)
 #    s.test_search_in_python_org()
 #    s.tearDown()
