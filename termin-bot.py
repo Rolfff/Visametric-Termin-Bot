@@ -19,7 +19,6 @@ import time
 import os
 import logging
 
-GECKOPATH = c.install["LINUX_GECKOPATH"]
 
 logging.basicConfig(filename=c.install["LOGFILE"], level=logging.INFO)
 
@@ -52,7 +51,9 @@ class Search:
     def __init__(self):
         self.url = "http://www.python.org"
         options = Options()
-        if not c.install["isLinux"]:
+        if c.install["isLinux"]:
+            GECKOPATH = c.install["LINUX_GECKOPATH"]
+        else:
             options.binary_location = c.install["win_binary_location"]
             GECKOPATH = c.install["WINDOWS_GECKOPATH"]
         ua = UserAgent()
