@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.relative_locator import locate_with
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from fake_useragent import UserAgent
 from datetime import datetime
@@ -60,11 +61,14 @@ class Search:
         userAgent = ua.random
         print(userAgent)
         options.add_argument(f'user-agent={userAgent}')
-        firefox_profile = webdriver.FirefoxProfile()
-        firefox_profile.set_preference("browser.privatebrowsing.autostart", True)
-        cap = DesiredCapabilities().FIREFOX
-        cap["marionette"] = False
-        self.driver = webdriver.Firefox(capabilities=cap, options=options, firefox_profile=firefox_profile, executable_path=GECKOPATH)
+        #firefox_profile = webdriver.FirefoxProfile()
+        #firefox_profile.set_preference("browser.privatebrowsing.autostart", True)
+        #cap = DesiredCapabilities().FIREFOX
+        #cap["marionette"] = False
+        #self.driver = webdriver.Firefox(capabilities=cap, options=options, firefox_profile=firefox_profile, executable_path=GECKOPATH)
+        
+        service = Service(GECKOPATH)
+        self.driver = webdriver.Firefox(options=options, service=service, )
         self.driver.get(self.url)
    
 

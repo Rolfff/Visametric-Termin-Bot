@@ -4,7 +4,7 @@ install = {
     "isLinux": False,
     "LINUX_GECKOPATH":"/usr/local/bin/geckodriver",
     "WINDOWS_GECKOPATH": "C:\\path\\to\\geckodriver.exe",
-    "win_binary_location": r'C:\Program Files\Mozilla Firefox\firefox.exe',
+    "win_binary_location": r'C:\Program Files (x86)\Mozilla Firefox\firefox.exe',
     "LOGFILE": "./Visametric.log"
 }
 
