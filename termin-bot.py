@@ -21,7 +21,7 @@ import logging
 
 GECKOPATH = c.install["LINUX_GECKOPATH"]
 
-logging.basicConfig(filename=c.install["LOGFILE", level=logging.INFO)
+logging.basicConfig(filename=c.install["LOGFILE"], level=logging.INFO)
 
 OKGREEN = '\033[92m'                                                            
 OKBLUE = '\033[94m'                                                             
