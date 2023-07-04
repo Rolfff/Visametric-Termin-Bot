@@ -21,6 +21,8 @@ Copy and paste the following lines into the command prompt.
 pip install -U selenium
 pip install fake-useragent
 ```
+4. Install [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/) on your system. Make sure that Firefox runs without problems on your system.
+5. Download the [geckodriver](https://github.com/mozilla/geckodriver/releases) for your system and unzip it. (For Windows use 'geckodriver-v0.33.0-win32.zip'.) 
 
 Optional for linux:
 - ```sudo apt install speech-dispatcher```
@@ -29,6 +31,14 @@ Optional for linux:
 ## Usage
 1. [Downloard this script](https://github.com/Rolfff/Visametric-Termin-Bot/archive/refs/heads/master.zip).
 2. Fill [config_example.py](https://github.com/Rolfff/Visametric-Termin-Bot/blob/master/config_example.py) with your data.
+
+- For Windows systems:
+  - Edit path to Firefox binary ```"win_binary_location": r'C:\Program Files\Mozilla Firefox\firefox.exe'```
+  - Edit path to geckodriver (see Install step 5) ```"WINDOWS_GECKOPATH": "C:\\path\\to\\geckodriver.exe"``` for windows. (please use ```\\``` for ```\```.)
+- For Linux systems:
+  - switch ```"isLinux": False"``` to True.
+  - Edit path to geckodriver (see Install step 5) ```"LINUX_GECKOPATH":"/usr/local/bin/geckodriver"```.
+
 3. Rename the 'config_example.py' file to 'config.py'
 4. Open the command prompt at the location from the downloaded files and run ```python3 ./termin-bot.py```
 5. Answer the Google captcha and wait. Good luck!
