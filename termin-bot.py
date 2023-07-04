@@ -68,7 +68,7 @@ class Search:
         #self.driver = webdriver.Firefox(capabilities=cap, options=options, firefox_profile=firefox_profile, executable_path=GECKOPATH)
         
         service = Service(GECKOPATH)
-        self.driver = webdriver.Firefox(options=options, service=service, )
+        self.driver = webdriver.Firefox(options=options, service=service)
         self.driver.get(self.url)
    
 
