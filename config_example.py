@@ -1,4 +1,12 @@
 #!/usr/bin/env python
+#
+install = {
+    "isLinux": False,
+    "LINUX_GECKOPATH":"/usr/local/bin/geckodriver",
+    "WINDOWS_GECKOPATH": "C:\\path\\to\\geckodriver.exe",
+    "win_binary_location": r'C:\Program Files\Mozilla Firefox\firefox.exe',
+    "LOGFILE": "./Visametric.log"
+}
 
 legalization = {
     "landing_page" : "https://ir-appointment.visametric.com/de",
