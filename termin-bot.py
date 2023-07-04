@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.relative_locator import locate_with
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from fake_useragent import UserAgent
 from datetime import datetime
@@ -19,13 +20,8 @@ import time
 import os
 import logging
 
-isLinux = True
-WIN_GECKOPATH = "C:\\path\\to\\geckodriver.exe"
-win_binary_location = r'C:\Program Files\Mozilla Firefox\firefox.exe'
-GECKOPATH = "/usr/local/bin/geckodriver"
-LOGFILE = "./Visametric.log"
 
-logging.basicConfig(filename=LOGFILE, level=logging.INFO)
+logging.basicConfig(filename=c.install["LOGFILE"], level=logging.INFO)
 
 OKGREEN = '\033[92m'                                                            
 OKBLUE = '\033[94m'                                                             
@@ -56,18 +52,23 @@ class Search:
     def __init__(self):
         self.url = "http://www.python.org"
         options = Options()
-        if not isLinux:
-            options.binary_location = win_binary_location
-            GECKOPATH = WIN_GECKOPATH
+        if c.install["isLinux"]:
+            GECKOPATH = c.install["LINUX_GECKOPATH"]
+        else:
+            options.binary_location = c.install["win_binary_location"]
+            GECKOPATH = c.install["WINDOWS_GECKOPATH"]
         ua = UserAgent()
         userAgent = ua.random
         print(userAgent)
         options.add_argument(f'user-agent={userAgent}')
-        firefox_profile = webdriver.FirefoxProfile()
-        firefox_profile.set_preference("browser.privatebrowsing.autostart", True)
-        cap = DesiredCapabilities().FIREFOX
-        cap["marionette"] = False
-        self.driver = webdriver.Firefox(capabilities=cap, options=options, firefox_profile=firefox_profile, executable_path=GECKOPATH)
+        #firefox_profile = webdriver.FirefoxProfile()
+        #firefox_profile.set_preference("browser.privatebrowsing.autostart", True)
+        #cap = DesiredCapabilities().FIREFOX
+        #cap["marionette"] = False
+        #self.driver = webdriver.Firefox(capabilities=cap, options=options, firefox_profile=firefox_profile, executable_path=GECKOPATH)
+        
+        service = Service(GECKOPATH)
+        self.driver = webdriver.Firefox(options=options, service=service)
         self.driver.get(self.url)
    
 
@@ -89,7 +90,7 @@ class Search:
         try:
             assert 'Visametric - Visa Application Center' in driver.title
         except AssertionError:
-            if isLinux:
+            if c.install["isLinux"]:
                 os.system('spd-say "Error. Page not found!"')
             out.error("Error. Page not found!")
             logging.error(str(datetime.now())+" Page not found: "+c.legalization['landing_page'])
@@ -118,7 +119,7 @@ class Search:
         current_url = driver.current_url
         elem = driver.find_element(By.ID, 'recaptcha-anchor')
         while elem.get_attribute("aria-checked") == 'false' :
-            if isLinux:
+            if c.install["isLinux"]:
                 os.system('spd-say "Waiting for human interaction."')
             out.warn("Please resolve the captcha or press 'str+c' ")
             out.warn('Waiting for human interaction.')
