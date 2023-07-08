@@ -3,8 +3,6 @@
 This Python Selenium script helps to find available dates for legalization of documents by the [German Embassy](https://teheran.diplo.de/) in Tehran. 
 The script **only helps to enter your personal data**. You need to solve the Google Recaptcha for each operation.
 
-**The bot is no longer working. See [Issue 4](https://github.com/Rolfff/Visametric-Termin-Bot/issues/4)**
-
 ## Notes
 - It is tested and developed January 2023. When the page is rebuilt, the script should be adjusted.
 - The Script does not check the Transaction ID. It takes the first one.
