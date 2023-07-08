@@ -4,6 +4,7 @@
 import config as c
 
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -15,6 +16,7 @@ from selenium.webdriver.firefox.options import Options
 from fake_useragent import UserAgent
 from datetime import datetime
 from pathlib import Path
+import undetected_chromedriver as uc 
 import random
 import time
 import os
@@ -67,9 +69,15 @@ class Search:
         #cap["marionette"] = False
         #self.driver = webdriver.Firefox(capabilities=cap, options=options, firefox_profile=firefox_profile, executable_path=GECKOPATH)
         
-        service = Service(GECKOPATH)
-        self.driver = webdriver.Firefox(options=options, service=service)
-        self.driver.get(self.url)
+        #service = Service(GECKOPATH)
+        #self.driver = webdriver.Firefox(options=options, service=service)
+        
+        options = uc.ChromeOptions() 
+        #options.add_argument('--headless=new')
+        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        options.add_experimental_option('detach', True)
+        options.add_argument(f'user-agent={userAgent}')
+        self.driver = uc.Chrome(options=options) 
    
 
     def test_search_in_python_org(self):
@@ -87,11 +95,14 @@ class Search:
         out = Output()
         driver = self.driver
         driver.get(c.legalization['landing_page'])
+        time.sleep(5) # Delay for 10 seconds.
         try:
             assert 'Visametric - Visa Application Center' in driver.title
         except AssertionError:
-            if 'Just a moment...' in driver.title:
-                while 'Just a moment...' in driver.title :
+            if 'Just a moment...' in driver.title or 'Nur einen Moment...' in driver.title:
+                print('just a moment')
+                current_url = driver.current_url
+                while current_url == driver.current_url:
                     if c.install["isLinux"]:
                         os.system('spd-say "Waiting for human interaction."')
                     out.warn("Please resolve the captcha or press 'str+c' ")
@@ -103,30 +114,15 @@ class Search:
             out.error("Error. Page not found!")
             logging.error(str(datetime.now())+" Page not found: "+c.legalization['landing_page'])
             return None
-
-        #Push Button name="legalizationBtn" 
-        elem = driver.find_element(By.NAME, 'legalizationBtn')
-        elem.click()
-        #Check OK Radio-Input name="surveyStart" id="result0"
-        elem = driver.find_element(By.ID, 'result0')
-        elem.click()
-        #Check Iran Radio-Input name="nationality" id="result1"
-        WebDriverWait(driver, random.randint(5,25)).until(
-                    EC.element_to_be_clickable((By.ID, 'result1'))
-                )
-        elem = driver.find_element(By.ID, 'result1')
-        elem.click()
-        # Captcha Part id="recaptcha-anchor"
-        WebDriverWait(driver, random.randint(10,25)).until(
-            EC.frame_to_be_available_and_switch_to_it((By.XPATH,"//iframe[starts-with(@name, 'a-') and starts-with(@src, 'https://www.google.com/recaptcha')]"))
-            )
-        element = WebDriverWait(driver, random.randint(10,25)).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "div.recaptcha-checkbox-checkmark"))
-            )
-        driver.execute_script("arguments[0].click();", element)
+        return True
+        time.sleep(5) # Delay for 5 seconds.
+        
+        #try:
+        #    elem = driver.find_element(By.ID, 'recaptchaDisplay')
+        #except NoSuchElementException as e:
         current_url = driver.current_url
-        elem = driver.find_element(By.ID, 'recaptcha-anchor')
-        while elem.get_attribute("aria-checked") == 'false' :
+        #while 'Visametric - Visa Application Center' in driver.title :
+        while current_url == driver.current_url:
             if c.install["isLinux"]:
                 os.system('spd-say "Waiting for human interaction."')
             out.warn("Please resolve the captcha or press 'str+c' ")
@@ -134,9 +130,45 @@ class Search:
             time.sleep(10) # Delay for 10 seconds.
         out.info('captcha done')
         
-        driver.switch_to.default_content()
+        #Push Button name="legalizationBtn" 
+        #elem = driver.find_element(By.NAME, 'legalizationBtn')
+        #elem.click()
+        #Check OK Radio-Input name="surveyStart" id="result0"
+        WebDriverWait(driver, random.randint(10,25)).until(
+                    EC.element_to_be_clickable((By.ID, 'result0'))
+                )
+        elem = driver.find_element(By.ID, 'result0')
+        elem.click()
+        #Check Iran Radio-Input name="nationality" id="result1"
+        WebDriverWait(driver, random.randint(10,25)).until(
+                    EC.element_to_be_clickable((By.ID, 'result1'))
+                )
+        elem = driver.find_element(By.ID, 'result1')
+        elem.click()
+        # Captcha Part id="recaptcha-anchor"
+        #WebDriverWait(driver, random.randint(10,25)).until(
+        #    EC.frame_to_be_available_and_switch_to_it((By.XPATH,"//iframe[starts-with(@name, 'a-') and starts-with(@src, 'https://www.google.com/recaptcha')]"))
+        #    )
+        #element = WebDriverWait(driver, random.randint(10,25)).until(
+        #    EC.element_to_be_clickable((By.CSS_SELECTOR, "div.recaptcha-checkbox-checkmark"))
+        #    )
+        #driver.execute_script("arguments[0].click();", element)
+        #current_url = driver.current_url
+        #elem = driver.find_element(By.ID, 'recaptcha-anchor')
+        #while elem.get_attribute("aria-checked") == 'false' :
+        #    if c.install["isLinux"]:
+        #        os.system('spd-say "Waiting for human interaction."')
+        #    out.warn("Please resolve the captcha or press 'str+c' ")
+        #    out.warn('Waiting for human interaction.')
+        #    time.sleep(10) # Delay for 10 seconds.
+        #out.info('captcha done')
+        #driver.switch_to.default_content()
+        
         #To ignore google recaptcha
 #        driver.execute_script("$('#formAccessApplication').submit();")
+        WebDriverWait(driver, random.randint(10,25)).until(
+                    EC.element_to_be_clickable((By.ID, 'btnSubmit'))
+                )
         driver.find_element(By.ID, 'btnSubmit').click()
 
         
@@ -186,10 +218,24 @@ class Search:
         elem.click()
         #Button id="checkCardListBtn"
         driver.find_element(By.ID, 'checkCardListBtn').click()
-        #Check  Radio-Input name="bankpayment"
-        WebDriverWait(driver, 5).until(
+        
+        time.sleep(2) # Delay for 2 seconds.
+        #Warnung
+        
+      #"sa-icon sa-warning pulseWarning"
+    
+        try:
+            #Check  Radio-Input name="bankpayment"
+            WebDriverWait(driver, 5).until(
                     EC.element_to_be_clickable((By.NAME, 'bankpayment'))
                 ).click()
+        except TimeoutException:
+            eMessage = "Please check the config file. No payments were found."
+            if c.install["isLinux"]:
+                os.system('spd-say "'+eMessage+'"')
+            out.error(eMessage)
+            logging.error(str(datetime.now())+": "+eMessage)
+            return None
 #        try:
 #            assert 'Visametric - Visa Application Center' in driver.title
 #        except AssertionError:
@@ -323,11 +369,11 @@ if __name__ == "__main__":
     while termin == False:
         s = Search()
         termin = s.getTerminByVisametric()
-#        if termin == None:
-#            termin = False
-#            time.sleep(5) # Delay for 5 seconds.
-#        if not termin:
-#            s.tearDown()
-#            del(s)
+        if termin == None:
+            termin = False
+            time.sleep(5) # Delay for 5 seconds.
+        if not termin:
+            s.tearDown()
+            del(s)
 #    s.test_search_in_python_org()
 #    s.tearDown()
