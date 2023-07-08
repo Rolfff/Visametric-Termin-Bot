@@ -12,7 +12,6 @@ from selenium.webdriver.support.relative_locator import locate_with
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.service import Service
-from selenium.webdriver.firefox.options import Options
 from fake_useragent import UserAgent
 from datetime import datetime
 from pathlib import Path
@@ -53,29 +52,13 @@ class Search:
 
     def __init__(self):
         self.url = "http://www.python.org"
-        options = Options()
-        if c.install["isLinux"]:
-            GECKOPATH = c.install["LINUX_GECKOPATH"]
-        else:
-            options.binary_location = c.install["win_binary_location"]
-            GECKOPATH = c.install["WINDOWS_GECKOPATH"]
         ua = UserAgent()
         userAgent = ua.random
         print(userAgent)
-        options.add_argument(f'user-agent={userAgent}')
-        #firefox_profile = webdriver.FirefoxProfile()
-        #firefox_profile.set_preference("browser.privatebrowsing.autostart", True)
-        #cap = DesiredCapabilities().FIREFOX
-        #cap["marionette"] = False
-        #self.driver = webdriver.Firefox(capabilities=cap, options=options, firefox_profile=firefox_profile, executable_path=GECKOPATH)
         
-        #service = Service(GECKOPATH)
-        #self.driver = webdriver.Firefox(options=options, service=service)
         
         options = uc.ChromeOptions() 
         #options.add_argument('--headless=new')
-        options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        options.add_experimental_option('detach', True)
         options.add_argument(f'user-agent={userAgent}')
         self.driver = uc.Chrome(options=options) 
    
@@ -114,7 +97,7 @@ class Search:
             out.error("Error. Page not found!")
             logging.error(str(datetime.now())+" Page not found: "+c.legalization['landing_page'])
             return None
-        return True
+        
         time.sleep(5) # Delay for 5 seconds.
         
         #try:
@@ -327,8 +310,11 @@ class Search:
         if foundTermin:
             #button id= btnAppCalendarNext
             driver.find_element(By.ID, 'btnAppCalendarNext').click()
-            out.success(str(datetime.now())+" Es wurde ein Termin gefunden!!!!")
-            logging.info(str(datetime.now())+" Es wurde ein Termin gefunden!!!!")
+            message = "Es wurde ein Termin gefunden!!!!"
+            if c.install["isLinux"]:
+                os.system('spd-say "'+message+'"')
+            out.success(str(datetime.now())+" "+message)
+            logging.info(str(datetime.now())+" "+message)
         else: 
             out.info(str(datetime.now())+" Leider keine Termine gefunden.")
             logging.info(str(datetime.now())+" Leider keine Termine gefunden.")
@@ -375,5 +361,20 @@ if __name__ == "__main__":
         if not termin:
             s.tearDown()
             del(s)
+        else:
+            out = Output()
+            message = "closing window at 20 minutes."
+            out.success(str(datetime.now())+" "+message)
+            logging.info(str(datetime.now())+" "+message)
+            time.sleep(600) # Delay for 600 seconds.
+            message = "The browser window is closing at 10 minutes."
+            if c.install["isLinux"]:
+                os.system('spd-say "'+message+'"')
+            out.success(str(datetime.now())+" "+message)
+            logging.info(str(datetime.now())+" "+message)
+            time.sleep(600) # Delay for 600 seconds.
+            message = "closing window."
+            out.success(str(datetime.now())+" "+message)
+            logging.info(str(datetime.now())+" "+message)
 #    s.test_search_in_python_org()
 #    s.tearDown()
