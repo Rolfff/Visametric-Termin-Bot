@@ -3,13 +3,17 @@
 This Python Selenium script helps to find available dates for legalization of documents by the [German Embassy](https://teheran.diplo.de/) in Tehran. 
 The script **only helps to enter your personal data**. You need to solve the Google Recaptcha for each operation.
 
+## Ethics notes
+- This script should help Iranian citizens to get an appointment at Visametric in the foreseeable future without having to spend a lot of money on the black market. It gives them the opportunity to work with similar or the same weapons as the appointment traders. 
+- Additionally, it can be used to document the appointment method of the German Embassy in Tehran and collect evidence for future complaints or court proceedings. 
+- Please feel free to adapt this script to future new conditions of the [Visametic website](https://ir-appointment.visametric.com/de/).
+
 ## Notes
-- It is tested and developed January 2023. When the page is rebuilt, the script should be adjusted.
+- It is tested and developed [January 2023](./log_history/2023-01-14_Visametric.log) for the first time. When the page is rebuilt, the script should be adjusted.
+- At the moment it works only if you have paid with card the Visametirc deposit.
 - The Script does not check the Transaction ID. It takes the first one.
 - The Script take the first found time slot and stops.
-
-
-https://ir-appointment.visametric.com/de/
+- The bot works only with the [german formular](https://ir-appointment.visametric.com/de/). (You are invited to extend the script to other languages.)
 
 ## Install
 1. First install [Python3](https://www.python.org/downloads/) on your system. 
@@ -31,10 +35,11 @@ Optional for linux:
 
 ## Usage
 1. [Downloard this script](https://github.com/Rolfff/Visametric-Termin-Bot/archive/refs/heads/master.zip).
-2. Fill [config_example.py](https://github.com/Rolfff/Visametric-Termin-Bot/blob/master/config_example.py) with your data.
-3. Rename the 'config_example.py' file to 'config.py'
+2. Rename the 'config_example.py' file to 'config.py'.
+3. Fill [config_example.py](./config_example.py) with your data.
 4. Open the command prompt at the location from the downloaded files and run ```python3 ./termin-bot.py```
 5. Answer the captcha and wait. Good luck!
+6. If you want to help improve the situation for others, share your log file (see ```"LOGFILE": "./Visametric.log"``` path at your config.py) with us. We will document it [here](./log_history/).
 
 
 
