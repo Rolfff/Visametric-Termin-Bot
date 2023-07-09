@@ -3,6 +3,10 @@
 This Python Selenium script helps to find available dates for legalization of documents by the [German Embassy](https://teheran.diplo.de/) in Tehran. 
 The script **only helps to enter your personal data**. You need to solve the Google Recaptcha for each operation.
 
+## Ethnic note
+This script should help Iranian citizens to get an appointment at Visametric in the foreseeable future without having to spend a lot of money on the black market. It gives them the opportunity to work with similar or the same weapons as the appointment traders. 
+Additionally, it can be used to document the appointment method of the German Embassy in Tehran and collect evidence for future complaints or court proceedings. 
+
 ## Notes
 - It is tested and developed January 2023. When the page is rebuilt, the script should be adjusted.
 - The Script does not check the Transaction ID. It takes the first one.
