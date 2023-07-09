@@ -7,9 +7,8 @@ The script **only helps to enter your personal data**. You need to solve the Goo
 - It is tested and developed January 2023. When the page is rebuilt, the script should be adjusted.
 - The Script does not check the Transaction ID. It takes the first one.
 - The Script take the first found time slot and stops.
-
-
-https://ir-appointment.visametric.com/de/
+- At the moment it works only if you have paid with card the Visametirc deposit.
+- The bot works with the german formular https://ir-appointment.visametric.com/de/ (You are invited to extend the script to other languages.)
 
 ## Install
 1. First install [Python3](https://www.python.org/downloads/) on your system. 
@@ -31,10 +30,11 @@ Optional for linux:
 
 ## Usage
 1. [Downloard this script](https://github.com/Rolfff/Visametric-Termin-Bot/archive/refs/heads/master.zip).
-2. Fill [config_example.py](https://github.com/Rolfff/Visametric-Termin-Bot/blob/master/config_example.py) with your data.
-3. Rename the 'config_example.py' file to 'config.py'
+2. Rename the 'config_example.py' file to 'config.py'
+3. Fill [config_example.py](./config_example.py) with your data.
 4. Open the command prompt at the location from the downloaded files and run ```python3 ./termin-bot.py```
 5. Answer the captcha and wait. Good luck!
+6. If you want to help improve the situation for others, share your log file (see ```"LOGFILE": "./Visametric.log"``` path at your config.py) with us. We will document it [here](./log_history/).
 
 
 
