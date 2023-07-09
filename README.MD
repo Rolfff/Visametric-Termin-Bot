@@ -9,7 +9,7 @@ The script **only helps to enter your personal data**. You need to solve the Goo
 - Please feel free to adapt this script to future new conditions of the [Visametic website](https://ir-appointment.visametric.com/de/).
 
 ## Notes
-- It is tested and developed January 2023. When the page is rebuilt, the script should be adjusted.
+- It is tested and developed [January 2023](./log_history/2023-01-14_Visametric.log) for the first time. When the page is rebuilt, the script should be adjusted.
 - The Script does not check the Transaction ID. It takes the first one.
 - The Script take the first found time slot and stops.
 - At the moment it works only if you have paid with card the Visametirc deposit.
